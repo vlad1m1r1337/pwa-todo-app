@@ -4,3 +4,6 @@ psycopg2-binary==2.9.10
 django-cors-headers==4.6.0
 python-dotenv==1.0.1
 drf-spectacular==0.28.0
+gunicorn==23.0.0
+whitenoise==6.8.2
+dj-database-url==2.3.0
