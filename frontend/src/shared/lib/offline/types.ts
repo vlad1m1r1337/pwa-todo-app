@@ -58,20 +58,6 @@ export interface ResourceAdapter<T = unknown, C = unknown, U = unknown> {
   onSynced?: (event: SyncEvent<T>) => void
   onRollback?: (op: PendingOp) => void
   refetch?: () => Promise<void>
-  /**
-   * Стратегия объединения двух update-payload'ов при схлопывании
-   * последовательных update'ов по одному `targetId`. По умолчанию —
-   * shallow-merge (`{ ...existing, ...incoming }`), что соответствует
-   * семантике PATCH. Переопределяется, если у ресурса есть вложенные
-   * структуры или массивы, требующие специального мёржа.
-   */
-  mergeUpdatePayload?: (existing: U, incoming: U) => U
-  /**
-   * Стратегия объединения incoming-update в ещё не улетевший create:
-   * поля из update должны стать частью payload'а create. По умолчанию —
-   * shallow-merge (`{ ...createPayload, ...updatePayload }`).
-   */
-  mergeUpdateIntoCreate?: (createPayload: C, updatePayload: U) => C
 }
 
 export const isTempId = (id: ResourceId): id is string =>

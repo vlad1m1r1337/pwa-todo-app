@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { idbStorage } from '../../../lib/storage'
+import { idbStorage } from '@/shared/lib/storage'
 import { formatError, isNetworkError } from './network'
 import type { PendingOp, ResourceAdapter, ResourceId } from './types'
 

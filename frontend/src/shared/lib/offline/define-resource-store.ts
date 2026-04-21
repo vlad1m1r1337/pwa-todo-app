@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, type Ref } from 'vue'
-import { idbStorage } from '../../../lib/storage'
+import { idbStorage } from '@/shared/lib/storage'
 import { registerResource, useSyncQueueStore } from './sync-queue'
 import {
   isTempId,
@@ -23,16 +23,6 @@ export interface ResourceStoreOptions<
    * Сюда вплетается временный id — сервер его заменит после ответа.
    */
   makeOptimistic: (payload: C, tempId: string) => T
-  /**
-   * Переопределение стратегии схлопывания двух последовательных update'ов.
-   * По умолчанию применяется shallow-merge, что соответствует PATCH-семантике.
-   */
-  mergeUpdatePayload?: (existing: U, incoming: U) => U
-  /**
-   * Переопределение стратегии схлопывания update'а в ещё не улетевший create.
-   * По умолчанию — shallow-merge в payload create'а.
-   */
-  mergeUpdateIntoCreate?: (createPayload: C, updatePayload: U) => C
 }
 
 /**
@@ -59,8 +49,7 @@ export function defineResourceStore<
   C,
   U,
 >(options: ResourceStoreOptions<T, C, U>) {
-  const { name, api, makeOptimistic, mergeUpdatePayload, mergeUpdateIntoCreate } =
-    options
+  const { name, api, makeOptimistic } = options
 
   const useStore = defineStore(
     name,
@@ -157,6 +146,8 @@ export function defineResourceStore<
       }
     },
     onRollback(op) {
+      // Откатываем оптимистичное создание, если сервер его отверг
+      // (dependent updates/deletes до такого момента не доживают).
       if (op.kind === 'create') {
         const store = useStore()
         const idx = store.items.findIndex((t) => t.id === op.tempId)
@@ -164,8 +155,6 @@ export function defineResourceStore<
       }
     },
     refetch: () => useStore().fetchAll(),
-    mergeUpdatePayload,
-    mergeUpdateIntoCreate,
   }
   registerResource(adapter as unknown as ResourceAdapter)
 

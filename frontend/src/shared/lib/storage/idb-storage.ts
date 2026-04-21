@@ -1,5 +1,6 @@
 import localforage from 'localforage'
 
+// Отдельный инстанс IndexedDB для состояния Pinia.
 // Не пересекается с Cache Storage, который Workbox использует
 // для runtime-кэша HTTP-ответов.
 const idb = localforage.createInstance({
@@ -13,7 +14,7 @@ const idb = localforage.createInstance({
  * Должен совпадать с `persist.key` каждого стора.
  *
  * При добавлении нового ресурса через `defineResourceStore` достаточно
- * дописать сюда его `name`. Ключ очереди синхронизации оставлен как есть.
+ * дописать сюда его `name` и ключ очереди синхронизации оставить как есть.
  */
 export const PERSISTED_KEYS = ['sync-queue', 'todos'] as const
 

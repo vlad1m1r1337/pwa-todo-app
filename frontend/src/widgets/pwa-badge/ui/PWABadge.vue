@@ -51,15 +51,12 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
 })
 
 const title = computed(() => {
-  
-    
   if (needRefresh.value)
     return 'New content available, click on reload button to update.'
   return ''
 })
 
 function close() {
-  
   needRefresh.value = false
 }
 </script>
