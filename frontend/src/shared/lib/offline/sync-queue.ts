@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { idbStorage } from '@/shared/lib/storage'
+import { idbStorage } from '../../../lib/storage'
 import { formatError, isNetworkError } from './network'
 import type { PendingOp, ResourceAdapter, ResourceId } from './types'
 
@@ -43,63 +43,8 @@ export const useSyncQueueStore = defineStore(
     }
 
     function enqueue(op: PendingOp) {
-      if (tryCoalesce(op)) {
-        void flush()
-        return
-      }
       queue.value.push(op)
       void flush()
-    }
-
-    const shallowMerge = (a: unknown, b: unknown): unknown => ({
-      ...(a as object),
-      ...(b as object),
-    })
-
-    /**
-     * Схлопывает новый `update` с последней совместимой операцией по тому же
-     * `targetId` в очереди, чтобы уменьшить количество PATCH-ов:
-     *   - в ожидающий `update` → объединяем payload'ы,
-     *   - в ожидающий `create` → вливаем поля update'а прямо в payload create'а
-     *     (тогда серверу уедет один POST со всеми полями, а не POST + PATCH).
-     *
-     * В обоих случаях новая операция в очередь не попадает и возвращаем `true`.
-     *
-     * Важно: операцию в голове очереди (index 0) не трогаем, если сейчас идёт
-     * `flush` — её payload уже мог быть передан в `axios` и может сериализоваться
-     * в любой момент. Мёрж туда создал бы race condition.
-     */
-    function tryCoalesce(op: PendingOp): boolean {
-      if (op.kind !== 'update') return false
-      const start = syncing.value ? 1 : 0
-      const adapter = adapters.get(op.resource)
-      const mergeUpdate = adapter?.mergeUpdatePayload ?? shallowMerge
-      const mergeIntoCreate = adapter?.mergeUpdateIntoCreate ?? shallowMerge
-
-      for (let i = queue.value.length - 1; i >= start; i--) {
-        const prev = queue.value[i]!
-        if (prev.resource !== op.resource) continue
-
-        if (prev.kind === 'create' && prev.tempId === op.targetId) {
-          prev.payload = (mergeIntoCreate as (a: unknown, b: unknown) => unknown)(
-            prev.payload,
-            op.payload,
-          )
-          return true
-        }
-        if (prev.kind === 'update' && prev.targetId === op.targetId) {
-          prev.payload = (mergeUpdate as (a: unknown, b: unknown) => unknown)(
-            prev.payload,
-            op.payload,
-          )
-          return true
-        }
-        if ('targetId' in prev && prev.targetId === op.targetId) {
-          // Упёрлись в delete того же элемента — сливать некуда и не во что.
-          return false
-        }
-      }
-      return false
     }
 
     /** Перепривязываем tempId → real id в ожидающих операциях того же ресурса. */
