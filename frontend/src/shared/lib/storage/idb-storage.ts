@@ -12,8 +12,11 @@ const idb = localforage.createInstance({
 /**
  * Список ключей, которые мы предзагружаем из IDB на старте приложения.
  * Должен совпадать с `persist.key` каждого стора.
+ *
+ * При добавлении нового ресурса через `defineResourceStore` достаточно
+ * дописать сюда его `name` и ключ очереди синхронизации оставить как есть.
  */
-export const PERSISTED_KEYS = ['todos'] as const
+export const PERSISTED_KEYS = ['sync-queue', 'todos'] as const
 
 const cache = new Map<string, string | null>()
 
