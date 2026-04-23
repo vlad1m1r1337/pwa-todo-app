@@ -43,7 +43,7 @@ interface ResourceStoreOptions<T extends { id: ResourceId }, C, U> {
 export function defineResourceStore<T extends { id: ResourceId }, C, U>(
   options: ResourceStoreOptions<T, C, U>,
 ) {
-  const { name, api, makeOptimistic } = options;
+  const { name, api, makeOptimistic } = options
 
   const useStore = defineStore(
     name,
