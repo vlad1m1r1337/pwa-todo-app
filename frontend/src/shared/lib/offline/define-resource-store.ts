@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
 import { idbStorage } from '@/shared/lib/storage';
-import { registerResource, useSyncQueueStore } from './sync-queue';
+import { registerResource, useSyncQueueStore } from './sync-queue'
 import {
   isTempId,
   makeTempId,
