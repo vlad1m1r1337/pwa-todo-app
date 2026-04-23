@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
 import { idbStorage } from '@/shared/lib/storage';
-import { registerResource, useSyncQueueStore } from './sync-queue'
+import { registerResource, useSyncQueueStore } from './sync-queue';
 import {
   isTempId,
   makeTempId,
@@ -18,7 +18,7 @@ interface ResourceStoreOptions<T extends { id: ResourceId }, C, U> {
    * Собираем оптимистичное представление элемента из payload'а create.
    * Сюда вплетается временный id — сервер его заменит после ответа.
    */
-  makeOptimistic: (payload: C, tempId: string) => T
+  makeOptimistic: (payload: C, tempId: string) => T;
 }
 
 /**
@@ -43,7 +43,7 @@ interface ResourceStoreOptions<T extends { id: ResourceId }, C, U> {
 export function defineResourceStore<T extends { id: ResourceId }, C, U>(
   options: ResourceStoreOptions<T, C, U>,
 ) {
-  const { name, api, makeOptimistic } = options
+  const { name, api, makeOptimistic } = options;
 
   const useStore = defineStore(
     name,
