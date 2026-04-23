@@ -18,7 +18,7 @@ interface ResourceStoreOptions<T extends { id: ResourceId }, C, U> {
    * Собираем оптимистичное представление элемента из payload'а create.
    * Сюда вплетается временный id — сервер его заменит после ответа.
    */
-  makeOptimistic: (payload: C, tempId: string) => T;
+  makeOptimistic: (payload: C, tempId: string) => T
 }
 
 /**
